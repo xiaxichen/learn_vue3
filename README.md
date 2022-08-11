@@ -22,3 +22,10 @@ yarn lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+
+### api_path
+```text
+http://api.vikingship.xyz/public/swagger/index.html
+```

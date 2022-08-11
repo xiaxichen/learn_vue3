@@ -1,13 +1,23 @@
 <template>
   <div class="validate-input-container pb-3">
     <!--双向绑定v-model实现方法-->
-    <input :class="{'is-invalid':inputRef.error}"
+    <input v-if="tag !== 'textarea'"
+           :class="{'is-invalid':inputRef.error}"
            class="form-control"
            v-bind="$attrs"
            @blur="validateInput"
            :value="inputRef.val"
            @input="updateValue"
     >
+    <textarea v-else
+              :class="{'is-invalid':inputRef.error}"
+              class="form-control"
+              v-bind="$attrs"
+              @blur="validateInput"
+              :value="inputRef.val"
+              @input="updateValue"
+    >
+    </textarea>
     <!--    <input type="text" class="form-control" :class="{'is-invalid':inputRef.error}" v-model="inputRef.val"-->
     <!--           @blur="validateInput">-->
     <span v-if="inputRef.error" class="invalid-feedback">{{ inputRef.message }}</span>
@@ -26,12 +36,16 @@ interface RuleProp {
 }
 
 export type RulesProp = Array<RuleProp>
-
+export type TgaType = 'input' | 'textarea'
 export default defineComponent({
   name: 'ValidateInput',
   props: {
     rules: Array as PropType<RulesProp>,
-    modelValue: String
+    modelValue: String,
+    tag: {
+      type: String as PropType<TgaType>,
+      default: 'input'
+    }
   },
   inheritAttrs: false,
   setup (props, context) {

@@ -16,8 +16,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useRoute } from 'vue-router'
-import { testData, testPosts } from '@/data/test'
 import PostList from '@/components/PostList.vue'
+
+import { useStore } from 'vuex'
+import { GlobalDataProps } from '@/interfaceList/global'
 
 export default defineComponent({
   name: 'ColumnDetail',
@@ -25,13 +27,11 @@ export default defineComponent({
     PostList
   },
   setup () {
+    const store = useStore<GlobalDataProps>()
     const route = useRoute()
     const currentId = +route.params.id
-    const column = testData.find(c => c.id === currentId)
-    console.log(testPosts)
-    console.log(currentId)
-    const list = testPosts.filter(post => post.columnId === currentId)
-    console.log(list)
+    const column = store.getters.getColumnById(currentId)
+    const list = store.getters.getPostByCid(currentId)
     return {
       column,
       list

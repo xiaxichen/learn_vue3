@@ -13,9 +13,11 @@
       <!--      <li class="list-inline-item" ><a href="#" class="btn btn-outline-light my-2">你好 {{ user.name }}</a></li>-->
       <li class="list-inline-item">
         <DropDown :title="`你好 ${user.name}`">
-          <DropDownItems><a class="dropdown-item" href="#">新建文章</a></DropDownItems>
+          <DropDownItems>
+            <router-link class="dropdown-item" to="create">新建文章</router-link>
+          </DropDownItems>
           <DropDownItems disabled><a class="dropdown-item" href="#">编辑资料</a></DropDownItems>
-          <DropDownItems><a class="dropdown-item" href="#">退出登陆</a></DropDownItems>
+          <DropDownItems><a class="dropdown-item" href="#" @click="LoginOut">退出登陆</a></DropDownItems>
         </DropDown>
       </li>
     </ul>
@@ -27,6 +29,8 @@ import { defineComponent, PropType } from 'vue'
 import DropDown from '../components/DropDown.vue'
 import DropDownItems from '../components/DropDownItems.vue'
 import { UserProps } from '@/interfaceList/column'
+import { useStore } from 'vuex'
+import { GlobalDataProps } from '@/interfaceList/global'
 
 export default defineComponent({
   name: 'GlolbalHeader',
@@ -38,6 +42,15 @@ export default defineComponent({
     user: {
       type: Object as PropType<UserProps>,
       required: true
+    }
+  },
+  setup () {
+    const store = useStore<GlobalDataProps>()
+    const LoginOut = () => {
+      store.state.user.isLogin = false
+    }
+    return {
+      LoginOut
     }
   }
 })

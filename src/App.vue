@@ -22,7 +22,6 @@ import { computed, defineComponent } from 'vue'
 import NavHeaderSelf from './components/NavHeaderSelf.vue'
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { UserProps } from '@/interfaceList/column'
 import { useStore } from 'vuex'
 import { GlobalDataProps } from '@/interfaceList/global'
 
