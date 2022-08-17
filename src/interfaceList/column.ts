@@ -1,22 +1,31 @@
+export interface ImageProps {
+  _id?: string
+  url?: string
+  createdAt?: string
+}
+
 export interface ColumnProps {
-  id: number;
-  title: string;
-  avatar?: string;
-  description: string;
+  _id: number
+  title: string
+  author: string
+  avatar: ImageProps
+  createdAt: string
+  description: string
 }
 
 export interface PostProps {
-  id: number;
-  title: string;
-  content: string;
-  image?: string;
-  createdAt: string;
-  columnId: number
+  _id: number
+  title: string
+  excerpt?:string
+  content?: string
+  image?: ImageProps
+  createdAt: string
+  column: string
 }
 
 export interface UserProps {
-  isLogin: boolean;
+  isLogin: boolean
   name?: string;
   id?: number
-  columnId?: number
+  columnId?: string
 }

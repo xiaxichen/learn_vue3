@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import HomePage from '../views/HomePage.vue'
 import LoginPage from '../views/LoginPage.vue'
 import ColumnDetail from '../views/ColumnDetail.vue'
@@ -26,13 +26,14 @@ const routers = [{
     requireAuth: true // 添加该字段，表示进入这个路由是需要登录的
   }
 }]
-const routerHistory = createWebHistory()
+// const routerHistory = createWebHistory()
+const routerHistory = createWebHashHistory()
 export const router = createRouter({
   routes: routers,
   history: routerHistory
 })
 
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to) => {
   if (to.matched.some(record => record.meta.requireAuth)) {
     if (!store.state.user.isLogin) { // 判断当前的token是否存在和路由是否登录
       return {

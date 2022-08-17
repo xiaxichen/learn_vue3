@@ -1,5 +1,9 @@
 <template>
+
   <div class="container">
+    <template v-if="isLoading">
+      <LoaderCompose text="加载中！！！"></LoaderCompose>
+    </template>
     <!--    <GlobalHeader :user="currentUser"></GlobalHeader>-->
     <NavHeaderSelf :user="currentUser"></NavHeaderSelf>
     <router-view></router-view>
@@ -24,17 +28,21 @@ import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { useStore } from 'vuex'
 import { GlobalDataProps } from '@/interfaceList/global'
+import LoaderCompose from '@/components/LoaderCompose.vue'
 
 export default defineComponent({
   name: 'App',
   components: {
-    NavHeaderSelf
+    NavHeaderSelf,
+    LoaderCompose
   },
   setup () {
     const store = useStore<GlobalDataProps>()
     const currentUser = computed(() => store.state.user)
+    const isLoading = computed(() => store.state.loading)
     return {
-      currentUser
+      currentUser,
+      isLoading
     }
   }
 })

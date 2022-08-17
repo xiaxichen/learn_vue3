@@ -71,10 +71,10 @@ export default defineComponent({
         const { columnId } = store.state.user
         if (columnId) {
           const newPost: PostProps = {
-            id: new Date().getTime(),
+            _id: new Date().getTime(),
             title: titleVal.value,
             content: contentVal.value,
-            columnId,
+            column: columnId,
             createdAt: new Date().toLocaleString()
           }
           store.commit('createPost', newPost)
@@ -97,33 +97,37 @@ export default defineComponent({
   }
 })
 </script>
-<style>
-.create-post-page .file-upload-container {
-  height: 200px;
-  cursor: pointer;
-  overflow: hidden;
-}
+<style lang="scss">
+.create-post-page {
+  &.file-upload-container {
+    height: 200px;
+    cursor: pointer;
+    overflow: hidden;
 
-.create-post-page .file-upload-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
 }
 
 .uploaded-area {
   position: relative;
-}
 
-.uploaded-area:hover h3 {
-  display: block;
-}
+  &:hover {
+    h3 {
+      display: block;
+    }
+  }
 
-.uploaded-area h3 {
-  display: none;
-  position: absolute;
-  color: #999;
-  text-align: center;
-  width: 100%;
-  top: 50%;
+  h3 {
+    display: none;
+    position: absolute;
+    color: #999;
+    text-align: center;
+    width: 100%;
+    top: 50%;
+  }
 }
 </style>
