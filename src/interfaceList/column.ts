@@ -25,7 +25,7 @@ export interface PostProps {
 
 export interface UserProps {
   isLogin: boolean
-  name?: string;
+  nickName?: string;
   id?: number
   columnId?: string
 }

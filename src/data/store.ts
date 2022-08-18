@@ -14,31 +14,29 @@ const getAndCommit = async (url: string, params: any, commit: Commit, mutationsN
 }
 const postAndCommit = async (url: string, params: any, data: any, commit: Commit, mutationsName: string) => {
   // commit('setLoading', true)
-  const response = await axios.post(url, {
-    params,
-    data
-  })
+  const response = await axios.post(url, data, { params })
   // await new Promise(resolve => setTimeout(resolve,3000)) // 3秒后返回
   commit(mutationsName, response.data)
   // commit('setLoading', false)
-  return data
+  return response.data
 }
 
 const store = createStore<GlobalDataProps>({
   state: {
+    token: '',
     loading: true,
     columns: [],
     posts: [],
     user: currentUser
   },
   mutations: {
-    login (state, name: string) {
-      state.user = {
-        ...state.user,
-        isLogin: true,
-        name: name
-      }
-    },
+    // login (state, name: string) {
+    //   state.user = {
+    //     ...state.user,
+    //     isLogin: true,
+    //     name: name
+    //   }
+    // },
     createPost (state, rawData) {
       state.posts.push(rawData)
     },
@@ -51,8 +49,15 @@ const store = createStore<GlobalDataProps>({
     fetchPosts (state, rawData) {
       state.posts = rawData.data.list
     },
+    fetchCurrentUser (state, rawData) {
+      state.user = { isLogin: true, ...rawData.data }
+    },
     setLoading (state, status) {
       state.loading = status
+    },
+    login (state, rawData) {
+      state.token = rawData.data.token
+      axios.defaults.headers.common.Authorization = `Bearer ${state.token}`
     }
   },
   getters: {
@@ -97,8 +102,15 @@ const store = createStore<GlobalDataProps>({
       params,
       data
     }) {
-      const respData = await postAndCommit('/user/login', params, data, commit, 'login')
-      console.log(respData)
+      return await postAndCommit('/user/login', params, data, commit, 'login')
+    },
+    async loginAndFetch ({ dispatch }, loginData) {
+      return dispatch('login', loginData).then(() => {
+        return dispatch('fetchCurrentUser')
+      })
+    },
+    async fetchCurrentUser ({ commit }) {
+      getAndCommit('/user/current', {}, commit, 'fetchCurrentUser')
     }
   }
 })

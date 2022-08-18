@@ -9,12 +9,14 @@
       <!--    </div>-->
       <div class="mb-3">
         <label class="form-label">Email address</label>
-        <ValidateInput ref="inputRef" v-model="emailVal.val" :rules="emailRules" placeholder="请输入邮箱地址" type="email"></ValidateInput>
+        <ValidateInput ref="inputRef" v-model="emailVal.val" :rules="emailRules" placeholder="请输入邮箱地址"
+                       type="email"></ValidateInput>
         <!--      {{emailVal.val}}-->
       </div>
       <div class="mb-3">
         <label class="form-label">Password</label>
-        <ValidateInput v-model="passwdVal.val" :rules="passwdRules" class="form-control" placeholder="请输入密码" type="password" autocomplete></ValidateInput>
+        <ValidateInput v-model="passwdVal.val" :rules="passwdRules" class="form-control" placeholder="请输入密码"
+                       type="password" autocomplete></ValidateInput>
       </div>
       <!-- v-slot = #-->
       <template #submit>
@@ -74,8 +76,25 @@ export default defineComponent({
         //   name: 'column',
         //   params: { id: 1 }
         // })
-        store.commit('login', 'zheye')
-        router.push('/')
+        const payload = {
+          email: emailVal.val,
+          password: passwdVal.val
+        }
+        // store.dispatch('login', {
+        //   params: {},
+        //   data: payload
+        // }).then(() => {
+        //   store.dispatch('fetchCurrentUser').then(() => {
+        //     router.push('/')
+        //   })
+        // })
+        store.dispatch('loginAndFetch', {
+          params: {},
+          data: payload
+        }).then(() => {
+          router.push('/')
+        })
+        // store.commit('login', 'zheye')
       }
     }
     return {
