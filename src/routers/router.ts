@@ -1,9 +1,10 @@
-import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import HomePage from '../views/HomePage.vue'
 import LoginPage from '../views/LoginPage.vue'
 import ColumnDetail from '../views/ColumnDetail.vue'
 import CreatePost from '@/views/CreatePost.vue'
 import store from '@/data/store'
+import RegisterPage from '@/views/RegisterPage.vue'
 
 const routers = [{
   path: '/',
@@ -25,7 +26,12 @@ const routers = [{
     title: '',
     requireAuth: true // 添加该字段，表示进入这个路由是需要登录的
   }
-}]
+}, {
+  path: '/register',
+  name: 'register',
+  component: RegisterPage
+}
+]
 // const routerHistory = createWebHistory()
 const routerHistory = createWebHashHistory()
 export const router = createRouter({

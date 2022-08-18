@@ -13,7 +13,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onUnmounted } from 'vue'
+import { defineComponent } from 'vue'
+import { createTeleportNode } from '@/utils/util'
 
 export default defineComponent({
   name: 'LoaderCompose',
@@ -30,12 +31,7 @@ export default defineComponent({
     }
   },
   setup (props) {
-    const node = document.createElement('div')
-    node.id = props.teleportId as string
-    document.body.appendChild(node)
-    onUnmounted(() => {
-      document.body.removeChild(node)
-    })
+    createTeleportNode(props.teleportId as string, 'div')
   }
 })
 </script>

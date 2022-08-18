@@ -16,7 +16,7 @@ export interface ColumnProps {
 export interface PostProps {
   _id: number
   title: string
-  excerpt?:string
+  excerpt?: string
   content?: string
   image?: ImageProps
   createdAt: string
@@ -25,7 +25,8 @@ export interface PostProps {
 
 export interface UserProps {
   isLogin: boolean
-  nickName?: string;
-  id?: number
-  columnId?: string
+  nickName?: string
+  _id?: number
+  email?: string
+  column?: string
 }

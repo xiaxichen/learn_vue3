@@ -1,7 +1,7 @@
 import { Commit, createStore } from 'vuex'
 import axios from 'axios'
 import { currentUser } from '@/data/test'
-import { GlobalDataProps } from '@/interfaceList/global'
+import { GlobalDataProps, GlobalErrorProps } from '@/interfaceAndTypeList/global'
 
 const getAndCommit = async (url: string, params: any, commit: Commit, mutationsName: string) => {
   // commit('setLoading', true)
@@ -12,18 +12,23 @@ const getAndCommit = async (url: string, params: any, commit: Commit, mutationsN
   commit(mutationsName, response.data)
   // commit('setLoading', false)
 }
-const postAndCommit = async (url: string, params: any, data: any, commit: Commit, mutationsName: string) => {
+const postAndCommit = async (url: string, params: any, data: any, commit: Commit, mutationsName = '') => {
   // commit('setLoading', true)
   const response = await axios.post(url, data, { params })
   // await new Promise(resolve => setTimeout(resolve,3000)) // 3秒后返回
-  commit(mutationsName, response.data)
+  if (mutationsName) {
+    commit(mutationsName, response.data)
+  }
   // commit('setLoading', false)
   return response.data
 }
 
 const store = createStore<GlobalDataProps>({
   state: {
-    token: '',
+    error: {
+      status: false
+    },
+    token: localStorage.getItem('token') || '',
     loading: true,
     columns: [],
     posts: [],
@@ -55,9 +60,28 @@ const store = createStore<GlobalDataProps>({
     setLoading (state, status) {
       state.loading = status
     },
+    setError (state, e: GlobalErrorProps) {
+      state.error = e
+    },
+    setErrorStatus (state, status = false) {
+      state.error.status = status
+    },
     login (state, rawData) {
       state.token = rawData.data.token
-      axios.defaults.headers.common.Authorization = `Bearer ${state.token}`
+      localStorage.setItem('token', rawData.data.token)
+      axios.defaults.headers.common.Authorization = `Bearer ${rawData.data.token}`
+    },
+    logOut (state) {
+      state.token = ''
+      localStorage.setItem('token', '')
+      state.user = {
+        column: '',
+        _id: 0,
+        email: '',
+        isLogin: false,
+        nickName: ''
+
+      }
     }
   },
   getters: {
@@ -98,6 +122,12 @@ const store = createStore<GlobalDataProps>({
         pageSize
       }, commit, 'fetchPosts')
     },
+    async register ({ commit }, {
+      params,
+      data
+    }) {
+      return await postAndCommit('users', params, data, commit)
+    },
     async login ({ commit }, {
       params,
       data
@@ -110,7 +140,7 @@ const store = createStore<GlobalDataProps>({
       })
     },
     async fetchCurrentUser ({ commit }) {
-      getAndCommit('/user/current', {}, commit, 'fetchCurrentUser')
+      await getAndCommit('/user/current', {}, commit, 'fetchCurrentUser')
     }
   }
 })

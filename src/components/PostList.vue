@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import { PostProps } from '@/interfaceList/column'
+import { PostProps } from '@/interfaceAndTypeList/column'
 export default defineComponent({
   props: {
     list: {

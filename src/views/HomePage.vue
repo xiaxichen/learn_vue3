@@ -27,7 +27,7 @@
 import { computed, defineComponent, onMounted } from 'vue'
 import ColumnList from '../components/ColumnList.vue'
 import { useStore } from 'vuex'
-import { GlobalDataProps } from '@/interfaceList/global'
+import { GlobalDataProps } from '@/interfaceAndTypeList/global'
 
 export default defineComponent({
   name: 'HomePage',

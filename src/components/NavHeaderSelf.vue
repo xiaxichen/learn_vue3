@@ -6,7 +6,7 @@
 import { defineComponent, PropType, reactive, ref } from 'vue'
 import GlobalHeader from '../components/GlobalHeader.vue'
 import { RulesProp } from '../components/ValidateInput.vue'
-import { UserProps } from '@/interfaceList/column'
+import { UserProps } from '@/interfaceAndTypeList/column'
 
 // const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 

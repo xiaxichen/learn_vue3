@@ -6,7 +6,7 @@
         <router-link class="btn btn-outline-light my-2" to="/login">登录</router-link>
       </li>
       <li class="list-inline-item">
-        <router-link class="btn btn-outline-light my-2" to="/login">注册</router-link>
+        <router-link class="btn btn-outline-light my-2" to="/register">注册</router-link>
       </li>
     </ul>
     <ul v-else class="list-inline mb-0">
@@ -28,9 +28,9 @@
 import { defineComponent, PropType } from 'vue'
 import DropDown from '../components/DropDown.vue'
 import DropDownItems from '../components/DropDownItems.vue'
-import { UserProps } from '@/interfaceList/column'
+import { UserProps } from '@/interfaceAndTypeList/column'
 import { useStore } from 'vuex'
-import { GlobalDataProps } from '@/interfaceList/global'
+import { GlobalDataProps } from '@/interfaceAndTypeList/global'
 
 export default defineComponent({
   name: 'GlolbalHeader',
@@ -47,7 +47,7 @@ export default defineComponent({
   setup () {
     const store = useStore<GlobalDataProps>()
     const LoginOut = () => {
-      store.state.user.isLogin = false
+      store.commit('logOut')
     }
     return {
       LoginOut

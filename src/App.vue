@@ -4,8 +4,12 @@
     <template v-if="isLoading">
       <LoaderCompose text="加载中！！！"></LoaderCompose>
     </template>
+    <!--    <template>-->
+    <!--      <MessageCompose v-if="error.status" type="error" :message="error.message"></MessageCompose>-->
+    <!--    </template>-->
     <!--    <GlobalHeader :user="currentUser"></GlobalHeader>-->
     <NavHeaderSelf :user="currentUser"></NavHeaderSelf>
+    <!--    <h1 v-if="error.status">{{ error.message || 'message is null' }}</h1>-->
     <router-view></router-view>
     <footer class="text-center py-4 text-secondary bg-light mt-6">
       <small>
@@ -21,14 +25,16 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, onMounted, watch } from 'vue'
+import axios from 'axios'
 
 import NavHeaderSelf from './components/NavHeaderSelf.vue'
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { useStore } from 'vuex'
-import { GlobalDataProps } from '@/interfaceList/global'
+import { GlobalDataProps } from '@/interfaceAndTypeList/global'
 import LoaderCompose from '@/components/LoaderCompose.vue'
+import createMessage from '@/utils/createMessage'
 
 export default defineComponent({
   name: 'App',
@@ -38,11 +44,29 @@ export default defineComponent({
   },
   setup () {
     const store = useStore<GlobalDataProps>()
+    const token = computed(() => store.state.token)
     const currentUser = computed(() => store.state.user)
     const isLoading = computed(() => store.state.loading)
+    const error = computed(() => store.state.error)
+    watch(() => error.value.status, () => {
+      const {
+        status,
+        message
+      } = error.value
+      if (status && message) {
+        createMessage(message, 'error')
+      }
+    })
+    onMounted(() => {
+      if (!currentUser.value.isLogin && token.value) {
+        axios.defaults.headers.common.Authorization = `Bearer ${token.value}`
+        store.dispatch('fetchCurrentUser')
+      }
+    })
     return {
       currentUser,
-      isLoading
+      isLoading,
+      error
     }
   }
 })
