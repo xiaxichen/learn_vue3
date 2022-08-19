@@ -1,6 +1,12 @@
 <template>
   <div class="create-post-page">
     <h4>新建文章</h4>
+    <UploaderCompose action="/upload" :before-upload="beforeUpload" @file-uploaded="onFileUploaded"
+                     @file-uploaded-error="onFileUploadedError">
+      <template #uploaded="dataProps">
+        <img :src="dataProps.uploadedData.data.url" alt="" width="500"/>
+      </template>
+    </UploaderCompose>
     <validate-form @form-submit="onFormSubmit">
       <div class="mb-3">
         <label class="form-label">文章标题：</label>
@@ -33,19 +39,22 @@
 import { defineComponent, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
-import { GlobalDataProps } from '@/interfaceAndTypeList/global'
+import { GlobalDataProps, ResponseType } from '@/interfaceAndTypeList/global'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
-import { PostProps } from '@/interfaceAndTypeList/column'
+import { ImageProps, PostProps } from '@/interfaceAndTypeList/column'
+import { handleFileChange } from '@/utils/util'
+import UploaderCompose from '@/components/UploaderCompose.vue'
+import createMessage from '@/utils/createMessage'
 
 export default defineComponent({
   name: 'CreatePost',
   components: {
     ValidateInput,
-    ValidateForm
+    ValidateForm,
+    UploaderCompose
   },
   setup () {
-    const uploadedData = ref()
     const titleVal = ref('')
     const router = useRouter()
     const route = useRoute()
@@ -85,14 +94,32 @@ export default defineComponent({
         }
       }
     }
+    const beforeUpload = (file: File) => {
+      const isJPG = file.type === 'image/jpeg' || file.type === 'image/jpg'
+      if (!isJPG) {
+        createMessage('不是jpg格式文件', 'error', 2000)
+        return false
+      }
+      return true
+    }
+    const onFileUploaded = (rawData: ResponseType<ImageProps>) => {
+      console.log(`上传图片ID ${rawData.data._id}`)
+      createMessage(`上传图片ID ${rawData.data._id}`, 'success')
+    }
+    const onFileUploadedError = (error: Error) => {
+      createMessage(`上传失败 ${error}`, 'success')
+    }
     return {
       titleRules,
       titleVal,
       contentVal,
       contentRules,
       onFormSubmit,
-      uploadedData,
-      isEditMode
+      isEditMode,
+      handleFileChange,
+      beforeUpload,
+      onFileUploaded,
+      onFileUploadedError
     }
   }
 })

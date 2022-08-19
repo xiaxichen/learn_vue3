@@ -13,3 +13,9 @@ export interface GlobalDataProps {
   posts: PostProps[]
   user: UserProps
 }
+
+export interface ResponseType<P> {
+  code: number
+  msg: string
+  data: P
+}
