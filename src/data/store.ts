@@ -67,7 +67,17 @@ const store = createStore<GlobalDataProps>({
       state.posts.data[rawData._id] = rawData
     },
     fetchColumns (state, rawData) {
-      state.columns = rawData.data.list
+      const { data } = state.columns
+      const {
+        list,
+        count,
+        currentPage
+      } = rawData.data
+      state.columns = {
+        data: { ...data, ...arrToObj(list) },
+        total: count,
+        currentPage: currentPage * 1
+      }
     },
     fetchColumn (state, rawData) {
       state.columns.data[rawData.data._id] = rawData.data
@@ -118,6 +128,9 @@ const store = createStore<GlobalDataProps>({
     //     return c._id
     //   }).length
     // },
+    getColumns: (state) => {
+      return objToArr(state.columns.data)
+    },
     getColumnById: (state) => (id: number) => {
       return state.columns.data[id]
     },
@@ -129,21 +142,33 @@ const store = createStore<GlobalDataProps>({
     }
   },
   actions: {
-    async fetchColumns (context, currentPage = 1, pageSize = 5) {
-      await getAndCommit('/columns', {
-        currentPage,
-        pageSize
-      }, context.commit, 'fetchColumns')
+    async fetchColumns (context, params = {}) {
+      const {
+        currentPage = 1,
+        pageSize = 6
+      } = params
+      // if (!state.columns.isLoaded) {
+      //   return asyncAndCommit('/columns', 'fetchColumns', commit)
+      // }
+      if (context.state.columns.currentPage < currentPage) {
+        return asyncAndCommit(`/columns?currentPage=${currentPage}&pageSize=${pageSize}`, 'fetchColumns', context.commit)
+      }
     },
-    async fetchColumn ({ commit }, cid) {
-      console.log('fetch fetchColumn', `/columns/${cid}`)
-      await getAndCommit(`/columns/${cid}`, {}, commit, 'fetchColumn')
+    async fetchColumn ({
+      commit,
+      state
+    }, cid) {
+      if (!state.columns.data[cid]) {
+        return asyncAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
+      }
     },
-    async fetchPosts ({ commit }, cid, currentPage = 1, pageSize = 5) {
-      await getAndCommit(`/columns/${cid}/posts`, {
-        currentPage,
-        pageSize
-      }, commit, 'fetchPosts')
+    async fetchPosts ({
+      commit,
+      state
+    }, cid) {
+      if (!state.posts.loadedColumns.includes(cid)) {
+        return asyncAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit, { method: 'get' }, cid)
+      }
     },
     async register ({ commit }, {
       params,

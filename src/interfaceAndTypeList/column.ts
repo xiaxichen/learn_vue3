@@ -2,15 +2,13 @@ export interface ImageProps {
   _id?: string
   url?: string
   createdAt?: string
-  fitUrl?: string;
+  fitUrl?: string
 }
 
 export interface ColumnProps {
-  _id: number
+  _id: string
   title: string
-  author: string
   avatar?: ImageProps
-  createdAt: string
   description: string
 }
 

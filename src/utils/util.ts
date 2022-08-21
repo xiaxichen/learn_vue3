@@ -13,7 +13,7 @@ export const createTeleportNode = (divId: string, divName = 'div'
     document.body.removeChild(node)
   })
 }
-export const handleFileChange = async (e: Event, action: string, beforeUpload: checkFunction, context: SetupContext<('file-uploaded' | 'file-uploaded-error')[]>, status: Ref<UploadStatus>, fileInput: Ref<HTMLInputElement>, uploadedData: Ref<null>) => {
+export const handleFileChange = async (e: Event, action: string, beforeUpload: checkFunction, context: SetupContext<('file-uploaded' | 'file-uploaded-error')[]>, status: Ref<UploadStatus>, fileInput: Ref<HTMLInputElement>, uploadedData: Ref<Record<string, any> | undefined>) => {
 // export const handleFileChange = async (e: Event, action: string, beforeUpload: checkFunction, emit: (event: ('file-uploaded' | 'file-uploaded-error'), ...args: any[]) => void, status: Ref<UploadStatus>, fileInput: Ref<HTMLInputElement>) => {
   const target = e.target as HTMLInputElement
   if (target.files) {
@@ -78,15 +78,6 @@ export const beforeUploadCheck = (file: File, condition: CheckCondition) => {
     passed: isValidFormat && isValidSize,
     error
   }
-}
-
-export function useDOMCreate (nodeId: string) {
-  const node = document.createElement('div')
-  node.id = nodeId
-  document.body.appendChild(node)
-  onUnmounted(() => {
-    document.body.removeChild(node)
-  })
 }
 
 export function generateFitUrl (data: ImageProps, width: number, height: number, format = ['m_pad']) {

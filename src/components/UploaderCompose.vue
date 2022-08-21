@@ -3,15 +3,16 @@
     <button @click.prevent="reduction">清除图片</button>
   </div>
   <div class="file-upload">
+    {{uploadedData}}
     <div class="file-upload-container" @click.prevent="triggerUpload" v-bind="$attrs">
       <slot v-if="fileStatus==='loading'" name="loading">
         <button class="btn btn primary" disabled>正在上传...</button>
       </slot>
       <slot v-else-if="fileStatus==='success'" name="uploaded" :uploadedData="uploadedData">
-        <button class="btn btn primary" disabled>上传成功</button>
+        <button class="btn btn primary">上传成功</button>
       </slot>
       <slot v-else-if="fileStatus==='error'" name="error">
-        <button class="btn btn primary" disabled>上传失败</button>
+        <button class="btn btn primary">上传失败</button>
       </slot>
       <slot v-else name="default">
         <button class="btn btn-primary btn-large" disabled>点击上传</button>
@@ -22,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, Ref, ref, SetupContext } from 'vue'
+import { defineComponent, PropType, Ref, ref, SetupContext, watch } from 'vue'
 import { checkFunction, UploadStatus } from '@/interfaceAndTypeList/upload'
 import { handleFileChange } from '@/utils/util'
 
@@ -35,14 +36,24 @@ export default defineComponent({
     },
     beforeUpload: {
       type: Function as PropType<checkFunction>
+    },
+    uploaded: {
+      type: Object
     }
   },
   inheritAttrs: false,
   emits: ['file-uploaded', 'file-uploaded-error'],
   setup (props, context) {
     const fileInput = ref<null | HTMLInputElement>(null)
-    const fileStatus = ref<UploadStatus>('ready')
-    const uploadedData = ref()
+    const fileStatus = ref<UploadStatus>(props.uploaded ? 'success' : 'ready')
+    const uploadedData = ref(props.uploaded)
+    watch(() => props.uploaded, (newValue) => {
+      console.log(newValue)
+      if (newValue) {
+        fileStatus.value = 'success'
+        uploadedData.value = newValue
+      }
+    })
     const reduction = () => {
       fileStatus.value = 'ready'
       if (fileInput.value) {

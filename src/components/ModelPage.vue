@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { useDOMCreate } from '@/utils/util'
+import { createTeleportNode } from '@/utils/util'
 export default defineComponent({
   name: 'ModelPage',
   props: {
@@ -36,7 +36,7 @@ export default defineComponent({
   },
   emits: ['modal-on-close', 'modal-on-confirm'],
   setup (props, context) {
-    useDOMCreate('modal')
+    createTeleportNode('modal')
     const onClose = () => {
       context.emit('modal-on-close')
     }

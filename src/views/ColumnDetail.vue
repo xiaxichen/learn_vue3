@@ -2,7 +2,7 @@
   <div class="column-detail-page w-75 mx-auto">
     <div class="column-info row mb-4 border-bottom pb-4 align-items-center" v-if="column">
       <div class="col-3 text-center">
-        <img :src="column.avatar.url" :alt="column.title" class="rounded-circle border w-100">
+        <img :src="column.avatar && column.avatar.fitUrl" :alt="column.title" class="rounded-circle border w-100">
       </div>
       <div class="col-9">
         <h4>{{ column.title }}</h4>
@@ -21,6 +21,7 @@ import PostList from '@/components/PostList.vue'
 import { useStore } from 'vuex'
 import { GlobalDataProps } from '@/interfaceAndTypeList/global'
 import { ColumnProps, PostProps } from '@/interfaceAndTypeList/column'
+import { addColumnAvatar } from '@/utils/util'
 
 export default defineComponent({
   name: 'ColumnDetail',
@@ -36,8 +37,12 @@ export default defineComponent({
       store.dispatch('fetchColumn', currentId)
       store.dispatch('fetchPosts', currentId)
     })
-    const column = computed<ColumnProps>(() => {
-      return store.getters.getColumnById(currentId)
+    const column = computed<ColumnProps | undefined>(() => {
+      const selectColumn = store.getters.getColumnById(currentId) as ColumnProps | undefined
+      if (selectColumn) {
+        addColumnAvatar(selectColumn, 100, 100)
+      }
+      return selectColumn
     })
     const list = computed<PostProps[]>(() => store.getters.getPostByCid(currentId))
     // const currentId = +route.params.id //转换为number

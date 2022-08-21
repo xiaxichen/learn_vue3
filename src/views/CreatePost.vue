@@ -1,21 +1,27 @@
 <template>
   <div class="create-post-page">
-    <h4>新建文章</h4>
-    <UploaderCompose action="/upload" :before-upload="beforeUpload" @file-uploaded="onFileUploaded"
+    <h4>{{ isEditMode ? '编辑文章' : '新建文章' }}</h4>
+    <UploaderCompose action="/upload"
+                     :before-upload="beforeUpload"
+                     @file-uploaded="onFileUploaded"
                      @file-uploaded-error="onFileUploadedError"
+                     :uploaded="uploadedData"
                      class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4 file-upload-container"
     >
       <h2>点击上传头图</h2>
       <template #loading>
         <div class="d-flex">
           <div class="spinner-border text-secondary" role="status">
-            <span class="sr-only">Loading ...</span>
+            <span class="sr-only">Loading...</span>
           </div>
           <h2>正在上传</h2>
         </div>
       </template>
       <template #uploaded="dataProps">
-        <img :src="dataProps.uploadedData.data.url" alt="" width="500"/>
+        <div class="uploaded-area">
+          <img :src="dataProps.uploadedData.data.url">
+<!--          <h3>点击重新上传</h3>-->
+        </div>
       </template>
     </UploaderCompose>
     <validate-form @form-submit="onFormSubmit">
@@ -30,7 +36,6 @@
       <div class="mb-3">
         <label class="form-label">文章详情：</label>
         <validate-input
-          type="text"
           rows="10"
           tag="textarea"
           placeholder="请输入文章详情"
@@ -39,7 +44,7 @@
         />
       </div>
       <template #submit>
-        <button class="btn btn-primary btn-large">发表文章
+        <button class="btn btn-primary btn-large">{{ isEditMode ? '更新文章' : '发表文章' }}
         </button>
       </template>
     </validate-form>
@@ -47,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
 import { GlobalDataProps, ResponseType } from '@/interfaceAndTypeList/global'
@@ -66,12 +71,13 @@ export default defineComponent({
     UploaderCompose
   },
   setup () {
+    const uploadedData = ref()
     const titleVal = ref('')
     const router = useRouter()
     const route = useRoute()
-    let imageId = ''
     const isEditMode = !!route.query.id
     const store = useStore<GlobalDataProps>()
+    let imageId = ''
     const titleRules: RulesProp = [
       {
         type: 'required',
@@ -85,8 +91,18 @@ export default defineComponent({
         message: '文章详情不能为空'
       }
     ]
-    // onMounted(() => {
-    // })
+    onMounted(() => {
+      if (isEditMode) {
+        store.dispatch('fetchPost', route.query.id).then((rawData: ResponseType<PostProps>) => {
+          const currentPost = rawData.data
+          if (currentPost.image) {
+            uploadedData.value = { data: currentPost.image }
+          }
+          titleVal.value = currentPost.title
+          contentVal.value = currentPost.content || ''
+        })
+      }
+    })
     const onFormSubmit = (result: boolean) => {
       if (result) {
         const {
@@ -99,20 +115,22 @@ export default defineComponent({
             title: titleVal.value,
             content: contentVal.value,
             column: column,
-            author: _id as string
+            author: _id
             // createdAt: new Date().toLocaleString()
           }
           if (imageId) {
             newPost.image = imageId
           }
-          store.dispatch('createPost', newPost).then((rewDta) => {
+          const actionName = isEditMode ? 'updatePost' : 'createPost'
+          const sendData = isEditMode ? { id: route.query.id, payload: newPost } : newPost
+          store.dispatch(actionName, sendData).then(() => {
             createMessage('发表成功，2秒后跳转到文章', 'success', 2000)
             setTimeout(() => {
               router.push({
                 name: 'column',
                 params: { id: column }
               })
-            })
+            }, 2000)
           })
         }
       }
@@ -130,7 +148,9 @@ export default defineComponent({
     }
     const onFileUploaded = (rawData: ResponseType<ImageProps>) => {
       console.log(`上传图片ID ${rawData.data._id}`)
-      imageId = rawData.data._id as string
+      if (rawData.data._id) {
+        imageId = rawData.data._id
+      }
       createMessage(`上传图片ID ${imageId}`, 'success')
     }
     const onFileUploadedError = (error: Error) => {
@@ -141,8 +161,9 @@ export default defineComponent({
       titleVal,
       contentVal,
       contentRules,
-      onFormSubmit,
       isEditMode,
+      uploadedData,
+      onFormSubmit,
       handleFileChange,
       beforeUpload,
       onFileUploaded,
