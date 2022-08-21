@@ -3,7 +3,6 @@
     <button @click.prevent="reduction">清除图片</button>
   </div>
   <div class="file-upload">
-    {{uploadedData}}
     <div class="file-upload-container" @click.prevent="triggerUpload" v-bind="$attrs">
       <slot v-if="fileStatus==='loading'" name="loading">
         <button class="btn btn primary" disabled>正在上传...</button>
