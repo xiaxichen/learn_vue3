@@ -14,19 +14,20 @@ export interface ColumnProps {
 }
 
 export interface PostProps {
-  _id: number
+  _id?: number
   title: string
   excerpt?: string
   content?: string
-  image?: ImageProps
-  createdAt: string
+  image?: ImageProps | string
+  createdAt?: string
   column: string
+  author: string
 }
 
 export interface UserProps {
   isLogin: boolean
   nickName?: string
-  _id?: number
+  _id?: string
   email?: string
   column?: string
 }

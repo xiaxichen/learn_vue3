@@ -2,7 +2,18 @@
   <div class="create-post-page">
     <h4>新建文章</h4>
     <UploaderCompose action="/upload" :before-upload="beforeUpload" @file-uploaded="onFileUploaded"
-                     @file-uploaded-error="onFileUploadedError">
+                     @file-uploaded-error="onFileUploadedError"
+                     class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4 file-upload-container"
+    >
+      <h2>点击上传头图</h2>
+      <template #loading>
+        <div class="d-flex">
+          <div class="spinner-border text-secondary" role="status">
+            <span class="sr-only">Loading ...</span>
+          </div>
+          <h2>正在上传</h2>
+        </div>
+      </template>
       <template #uploaded="dataProps">
         <img :src="dataProps.uploadedData.data.url" alt="" width="500"/>
       </template>
@@ -43,7 +54,7 @@ import { GlobalDataProps, ResponseType } from '@/interfaceAndTypeList/global'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
 import { ImageProps, PostProps } from '@/interfaceAndTypeList/column'
-import { handleFileChange } from '@/utils/util'
+import { beforeUploadCheck, handleFileChange } from '@/utils/util'
 import UploaderCompose from '@/components/UploaderCompose.vue'
 import createMessage from '@/utils/createMessage'
 
@@ -58,6 +69,7 @@ export default defineComponent({
     const titleVal = ref('')
     const router = useRouter()
     const route = useRoute()
+    let imageId = ''
     const isEditMode = !!route.query.id
     const store = useStore<GlobalDataProps>()
     const titleRules: RulesProp = [
@@ -77,34 +89,49 @@ export default defineComponent({
     // })
     const onFormSubmit = (result: boolean) => {
       if (result) {
-        const { column } = store.state.user
+        const {
+          column,
+          _id
+        } = store.state.user
         if (column) {
           const newPost: PostProps = {
-            _id: new Date().getTime(),
+            // _id: new Date().getTime(),
             title: titleVal.value,
             content: contentVal.value,
             column: column,
-            createdAt: new Date().toLocaleString()
+            author: _id as string
+            // createdAt: new Date().toLocaleString()
           }
-          store.commit('createPost', newPost)
-          router.push({
-            name: 'column',
-            params: { id: column }
+          if (imageId) {
+            newPost.image = imageId
+          }
+          store.dispatch('createPost', newPost).then((rewDta) => {
+            createMessage('发表成功，2秒后跳转到文章', 'success', 2000)
+            setTimeout(() => {
+              router.push({
+                name: 'column',
+                params: { id: column }
+              })
+            })
           })
         }
       }
     }
     const beforeUpload = (file: File) => {
-      const isJPG = file.type === 'image/jpeg' || file.type === 'image/jpg'
-      if (!isJPG) {
-        createMessage('不是jpg格式文件', 'error', 2000)
+      const fileUpdateErr = beforeUploadCheck(file, {
+        format: ['image/jpeg', 'image/png'],
+        size: 1
+      })
+      if (!fileUpdateErr.passed) {
+        createMessage(`${fileUpdateErr.error} error`, 'error', 2000)
         return false
       }
       return true
     }
     const onFileUploaded = (rawData: ResponseType<ImageProps>) => {
       console.log(`上传图片ID ${rawData.data._id}`)
-      createMessage(`上传图片ID ${rawData.data._id}`, 'success')
+      imageId = rawData.data._id as string
+      createMessage(`上传图片ID ${imageId}`, 'success')
     }
     const onFileUploadedError = (error: Error) => {
       createMessage(`上传失败 ${error}`, 'success')

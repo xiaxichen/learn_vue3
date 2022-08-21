@@ -41,23 +41,16 @@ export const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  if (to.matched.some(record => record.meta.requireAuth)) {
-    if (store.state.token !== '') {
-      axios.defaults.headers.common.Authorization = `Bearer ${store.state.token}`
-      store.dispatch('fetchCurrentUser', store.state.token).then(() => {
-        if (!store.state.user.isLogin) {
-          return {
-            name: 'login',
-            query: { redirect: to.fullPath } // 将跳转的路由path作为参数，登录成功后跳转到该路由
-          }
+  if (store.state.token !== '') {
+    axios.defaults.headers.common.Authorization = `Bearer ${store.state.token}`
+    store.dispatch('fetchCurrentUser', store.state.token).then(() => {
+      if (!store.state.user.isLogin && to.matched.some(record => record.meta.requireAuth)) {
+        return {
+          name: 'login',
+          query: { redirect: to.fullPath } // 将跳转的路由path作为参数，登录成功后跳转到该路由
         }
-      })
-    } else {
-      return {
-        name: 'login',
-        query: { redirect: to.fullPath } // 将跳转的路由path作为参数，登录成功后跳转到该路由
       }
-    }
+    })
   }
 })
 

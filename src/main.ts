@@ -36,6 +36,9 @@ axios.interceptors.request.use(config => {
   return config
 })
 axios.interceptors.response.use(config => {
+  // setTimeout(() => {
+  //   store.commit('setLoading', false)
+  // }, 5000)
   store.commit('setLoading', false)
   return config
 }, e => {

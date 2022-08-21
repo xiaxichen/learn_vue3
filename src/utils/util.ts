@@ -52,3 +52,29 @@ export const handleFileChange = async (e: Event, action: string, beforeUpload: c
     })
   }
 }
+
+interface CheckCondition {
+  format?: Array<string>
+  size?: number
+}
+
+type ErrorType = 'size' | 'format' | null
+export const beforeUploadCheck = (file: File, condition: CheckCondition) => {
+  const {
+    format,
+    size
+  } = condition
+  const isValidFormat = format ? format.includes(file.type) : true
+  const isValidSize = size ? size >= (file.size / 1024 / 1024) : true
+  let error: ErrorType = null
+  if (!isValidFormat) {
+    error = 'format'
+  }
+  if (!isValidSize) {
+    error = 'size'
+  }
+  return {
+    passed: isValidFormat && isValidSize,
+    error
+  }
+}

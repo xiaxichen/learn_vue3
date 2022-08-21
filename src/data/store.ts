@@ -2,6 +2,7 @@ import { Commit, createStore } from 'vuex'
 import axios from 'axios'
 import { currentUser } from '@/data/test'
 import { GlobalDataProps, GlobalErrorProps } from '@/interfaceAndTypeList/global'
+import { PostProps } from '@/interfaceAndTypeList/column'
 
 const getAndCommit = async (url: string, params: any, commit: Commit, mutationsName: string) => {
   // commit('setLoading', true)
@@ -76,12 +77,12 @@ const store = createStore<GlobalDataProps>({
       localStorage.setItem('token', '')
       state.user = {
         column: '',
-        _id: 0,
+        _id: '',
         email: '',
         isLogin: false,
         nickName: ''
-
       }
+      delete axios.defaults.headers.common.Authorization
     }
   },
   getters: {
@@ -141,6 +142,9 @@ const store = createStore<GlobalDataProps>({
     },
     async fetchCurrentUser ({ commit }) {
       await getAndCommit('/user/current', {}, commit, 'fetchCurrentUser')
+    },
+    async createPost ({ commit }, newPost: PostProps) {
+      return postAndCommit('posts', {}, newPost, commit, '')
     }
   }
 })
