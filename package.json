@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@popperjs/core": "^2.11.5",
+    "@types/markdown-it": "^12.2.3",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "@vue/cli-plugin-babel": "~5.0.0",
@@ -28,6 +29,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-vue": "^8.0.3",
+    "markdown-it": "^13.0.1",
     "mitt": "^3.0.0",
     "sass": "^1.54.3",
     "sass-loader": "^13.0.2",

@@ -2,26 +2,16 @@ export interface ImageProps {
   _id?: string
   url?: string
   createdAt?: string
+  fitUrl?: string;
 }
 
 export interface ColumnProps {
   _id: number
   title: string
   author: string
-  avatar: ImageProps
+  avatar?: ImageProps
   createdAt: string
   description: string
-}
-
-export interface PostProps {
-  _id?: number
-  title: string
-  excerpt?: string
-  content?: string
-  image?: ImageProps | string
-  createdAt?: string
-  column: string
-  author: string
 }
 
 export interface UserProps {
@@ -30,4 +20,17 @@ export interface UserProps {
   _id?: string
   email?: string
   column?: string
+  avatar?: ImageProps
+}
+
+export interface PostProps {
+  _id?: string;
+  title: string;
+  excerpt?: string;
+  content?: string;
+  image?: ImageProps | string;
+  createdAt?: string;
+  column: string;
+  author?: string | UserProps;
+  isHTML?: boolean;
 }

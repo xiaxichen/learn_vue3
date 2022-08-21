@@ -6,6 +6,7 @@ import CreatePost from '@/views/CreatePost.vue'
 import store from '@/data/store'
 import RegisterPage from '@/views/RegisterPage.vue'
 import axios from 'axios'
+import PostDetail from '@/views/PostDetail.vue'
 
 const routers = [{
   path: '/',
@@ -31,6 +32,10 @@ const routers = [{
   path: '/register',
   name: 'register',
   component: RegisterPage
+}, {
+  path: '/posts/:id',
+  mame: 'posts',
+  component: PostDetail
 }
 ]
 // const routerHistory = createWebHistory()

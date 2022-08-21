@@ -1,8 +1,9 @@
 import { Commit, createStore } from 'vuex'
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import { currentUser } from '@/data/test'
 import { GlobalDataProps, GlobalErrorProps } from '@/interfaceAndTypeList/global'
 import { PostProps } from '@/interfaceAndTypeList/column'
+import { arrToObj, objToArr } from '@/utils/util'
 
 const getAndCommit = async (url: string, params: any, commit: Commit, mutationsName: string) => {
   // commit('setLoading', true)
@@ -23,7 +24,19 @@ const postAndCommit = async (url: string, params: any, data: any, commit: Commit
   // commit('setLoading', false)
   return response.data
 }
-
+const asyncAndCommit = async (url: string, mutationName: string,
+  commit: Commit, config: AxiosRequestConfig = { method: 'get' }, extraData?: any) => {
+  const { data } = await axios(url, config)
+  if (extraData) {
+    commit(mutationName, {
+      data,
+      extraData
+    })
+  } else {
+    commit(mutationName, data)
+  }
+  return data
+}
 const store = createStore<GlobalDataProps>({
   state: {
     error: {
@@ -31,8 +44,15 @@ const store = createStore<GlobalDataProps>({
     },
     token: localStorage.getItem('token') || '',
     loading: true,
-    columns: [],
-    posts: [],
+    columns: {
+      data: {},
+      currentPage: 0,
+      total: 0
+    },
+    posts: {
+      data: {},
+      loadedColumns: []
+    },
     user: currentUser
   },
   mutations: {
@@ -44,16 +64,23 @@ const store = createStore<GlobalDataProps>({
     //   }
     // },
     createPost (state, rawData) {
-      state.posts.push(rawData)
+      state.posts.data[rawData._id] = rawData
     },
     fetchColumns (state, rawData) {
       state.columns = rawData.data.list
     },
     fetchColumn (state, rawData) {
-      state.columns = [rawData.data]
+      state.columns.data[rawData.data._id] = rawData.data
     },
-    fetchPosts (state, rawData) {
-      state.posts = rawData.data.list
+    fetchPosts (state, {
+      data: rawData,
+      extraData: columnId
+    }) {
+      state.posts.data = { ...state.posts.data, ...arrToObj(rawData.data.list) }
+      state.posts.loadedColumns.push(columnId)
+    },
+    fetchPost (state, rawData) {
+      state.posts.data[rawData.data._id] = rawData.data
     },
     fetchCurrentUser (state, rawData) {
       state.user = { isLogin: true, ...rawData.data }
@@ -92,18 +119,13 @@ const store = createStore<GlobalDataProps>({
     //   }).length
     // },
     getColumnById: (state) => (id: number) => {
-      const find = state.columns.find(c => c._id === id)
-      if (find !== undefined) {
-        if (!find.avatar) {
-          find.avatar = {
-            url: require('@/assets/column.png')
-          }
-        }
-      }
-      return find
+      return state.columns.data[id]
     },
     getPostByCid: (state) => (cid: string) => {
-      return state.posts.filter(post => post.column === cid)
+      return objToArr(state.posts.data).filter(post => post.column === cid)
+    },
+    getCurrentPost: (state) => (id: string) => {
+      return state.posts.data[id]
     }
   },
   actions: {
@@ -145,6 +167,17 @@ const store = createStore<GlobalDataProps>({
     },
     async createPost ({ commit }, newPost: PostProps) {
       return postAndCommit('posts', {}, newPost, commit, '')
+    },
+    async fetchPost ({
+      state,
+      commit
+    }, id) {
+      const currentPost = state.posts.data[id]
+      if (!currentPost || !currentPost.content) {
+        return asyncAndCommit(`/posts/${id}`, 'fetchPost', commit)
+      } else {
+        return Promise.resolve({ data: currentPost })
+      }
     }
   }
 })

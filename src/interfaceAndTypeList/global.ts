@@ -1,5 +1,9 @@
 import { ColumnProps, PostProps, UserProps } from '@/interfaceAndTypeList/column'
 
+interface ListProps<P> {
+  [id: string]: P;
+}
+
 export interface GlobalErrorProps {
   status: boolean
   message?: string
@@ -9,8 +13,8 @@ export interface GlobalDataProps {
   error: GlobalErrorProps
   token: string
   loading: boolean
-  columns: ColumnProps[]
-  posts: PostProps[]
+  columns: { data: ListProps<ColumnProps>; currentPage: number; total: number };
+  posts: { data: ListProps<PostProps>; loadedColumns: string[] };
   user: UserProps
 }
 

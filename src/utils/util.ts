@@ -2,6 +2,7 @@ import { onUnmounted, Ref, SetupContext } from 'vue'
 import axios from 'axios'
 import { checkFunction, UploadStatus } from '@/interfaceAndTypeList/upload'
 import createMessage from '@/utils/createMessage'
+import { ColumnProps, ImageProps, UserProps } from '@/interfaceAndTypeList/column'
 
 export const createTeleportNode = (divId: string, divName = 'div'
 ) => {
@@ -77,4 +78,45 @@ export const beforeUploadCheck = (file: File, condition: CheckCondition) => {
     passed: isValidFormat && isValidSize,
     error
   }
+}
+
+export function useDOMCreate (nodeId: string) {
+  const node = document.createElement('div')
+  node.id = nodeId
+  document.body.appendChild(node)
+  onUnmounted(() => {
+    document.body.removeChild(node)
+  })
+}
+
+export function generateFitUrl (data: ImageProps, width: number, height: number, format = ['m_pad']) {
+  if (data && data.url) {
+    const formatStr = format.reduce((prev, current) => {
+      return current + ',' + prev
+    }, '')
+    data.fitUrl = data.url + `?x-oss-process=image/resize,${formatStr}h_${height},w_${width}`
+  }
+}
+
+export function addColumnAvatar (data: ColumnProps | UserProps, width: number, height: number) {
+  if (data.avatar) {
+    generateFitUrl(data.avatar, width, height)
+  } else {
+    const parseCol = data as ColumnProps
+    data.avatar = {
+      fitUrl: require(parseCol.title ? '@/assets/column.png' : '@/assets/avatar.jpg')
+    }
+  }
+}
+
+export const arrToObj = <T extends { _id?: string }> (arr: Array<T>) => {
+  return arr.reduce((prev, current) => {
+    if (current._id) {
+      prev[current._id] = current
+    }
+    return prev
+  }, {} as { [key: string]: T })
+}
+export const objToArr = <T> (obj: { [key: string]: T }) => {
+  return Object.keys(obj).map(key => obj[key])
 }
