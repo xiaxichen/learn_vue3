@@ -187,6 +187,18 @@ const store = createStore<GlobalDataProps>({
         return dispatch('fetchCurrentUser')
       })
     },
+    async updatePost ({ commit }, {
+      id,
+      payload
+    }) {
+      return asyncAndCommit(`/posts/${id}`, 'updatePost', commit, {
+        method: 'patch',
+        data: payload
+      })
+    },
+    async deletePost ({ commit }, id) {
+      return asyncAndCommit(`/posts/${id}`, 'deletePost', commit, { method: 'delete' })
+    },
     async fetchCurrentUser ({ commit }) {
       await getAndCommit('/user/current', {}, commit, 'fetchCurrentUser')
     },
